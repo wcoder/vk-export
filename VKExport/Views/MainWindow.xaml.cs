@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
+using VkNet;
+using VkNet.Enums.Filters;
 
 namespace VKExport
 {
@@ -19,7 +22,7 @@ namespace VKExport
 			var auth = new AuthWindow();
 			auth.Authorized += App.Locator.MainWindow.OnAuthorized;
 			auth.Closing += OnClosing;
-			auth.ShowDialog();
+			auth.ShowDialog();			
 		}
 
 		private void OnClosing(object sender, CancelEventArgs e)
@@ -29,6 +32,5 @@ namespace VKExport
 				this.Close();
 			}
 		}
-
 	}
 }

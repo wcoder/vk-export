@@ -1,9 +1,10 @@
 ﻿using System;
+using VkNet;
 
 namespace VKExport.Common
 {
 	public class VkAuthEventArgs : EventArgs
 	{
-		public AccessTokenResponse Data { get; set; }
+		public VkApi Data { get; set; }
 	}
 }

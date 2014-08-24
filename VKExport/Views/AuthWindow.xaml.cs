@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using VKExport.Common;
+using VkNet;
+using VkNet.Enums.Filters;
 
 namespace VKExport
 {
@@ -34,36 +24,21 @@ namespace VKExport
 		{
 			InitializeComponent();
 
-			LoadAuthPage();
+			this.DataContext = App.Locator.AuthWindow;
 		}
 
-		private void Browser_LoadCompleted(object sender, NavigationEventArgs e)
+		private void AuthButton_Click(object sender, RoutedEventArgs arg)
 		{
-			if (e.Uri.ToString().Contains(Configs.RedirectUrl))
+			try
 			{
-				var response = VkApiHelpers.ParseAccessToken(e.Uri.Fragment);
+				App.Locator.AuthWindow.Authorize(Login.Text, Password.Password, OnAuthorized);
 
-				OnAuthorized(new VkAuthEventArgs { Data = response });
-
-				this.Title = "Авторизация прошла успешно!";
 				this.Close();
 			}
-			else if (e.Uri.ToString().Contains("error"))
+			catch (Exception e)
 			{
-				LoadAuthPage();
+				MessageBox.Show(e.Message);
 			}
-		}
-
-		private void LoadAuthPage()
-		{
-			this.Title = "Авторизация Вконтакте...";
-
-			var authUrl = string.Format(Configs.AuthUrl,
-										Configs.ClientId,
-										Configs.Scope,
-										Configs.RedirectUrl);
-
-			Browser.Navigate(new Uri(authUrl));
 		}
 	}
 }

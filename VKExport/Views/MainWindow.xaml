@@ -14,12 +14,10 @@
 					<StackPanel Orientation="Horizontal" Margin="5">
 						<TextBlock Text="Id собеседника: " />
 						<TextBox Width="150" Text="{Binding UserId, Mode=TwoWay}" />
-						<TextBlock Text=" Кол-во сообщений: " />
-						<TextBox Text="{Binding CountMessages}" IsEnabled="false" />
 					</StackPanel>
 					<StackPanel Orientation="Horizontal">
 						<Button Padding="5" Margin="5"
-								Content="Загрузить сообщения"
+								Content="Загрузить сообщения (200)"
 								HorizontalAlignment="Left"
 								Command="{Binding LoadMessagesCommand}"
 								/>
@@ -39,9 +37,9 @@
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<StackPanel Orientation="Horizontal">
-										<TextBlock Text="{Binding FromId}"/>
+										<TextBlock Text="{Binding UserId}"/>
 										<TextBlock Text=" > "/>
-										<TextBlock Text="{Binding Body}" TextWrapping="Wrap"/>
+										<TextBlock Text="{Binding Body}" TextWrapping="Wrap" />
 										<!--<TextBlock Text="{Binding Date}" />-->
 									</StackPanel>
 								</DataTemplate>
@@ -63,7 +61,7 @@
 				<Run Text="{Binding Status}" />
 			</TextBlock>
 			<TextBlock Grid.Column="1" HorizontalAlignment="Right">
-				<Run Text="Загружено сообщений: " />
+				<Run Text="Загружено: " />
 				<Run Text="{Binding Offset}" />
 			</TextBlock>
 		</Grid>

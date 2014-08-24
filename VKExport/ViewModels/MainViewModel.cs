@@ -2,9 +2,12 @@
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using VKExport.Common;
+using VkNet;
+using VkNet.Model;
 
 namespace VKExport.ViewModels
 {
@@ -14,8 +17,8 @@ namespace VKExport.ViewModels
 
 		private int _offset = 0;
 
-		private string _userId;
-		private ObservableCollection<DialogMessage> _messages;
+		private long _userId;
+		private ObservableCollection<Message> _messages;
 		private string _status;
 		private int _countMessages;
 		private RelayCommand _loadMessagesCommand;
@@ -26,7 +29,7 @@ namespace VKExport.ViewModels
 
 		#region properties
 
-		public AccessTokenResponse Auth { get; set; }
+		public VkApi Auth { get; set; }
 
 		public bool IsAuth {
 			get
@@ -34,7 +37,7 @@ namespace VKExport.ViewModels
 				return Auth != null;
 			}
 		}
-		public string UserId {
+		public long UserId {
 			get
 			{
 				return _userId;
@@ -46,7 +49,8 @@ namespace VKExport.ViewModels
 			}
 		}
 
-		public ObservableCollection<DialogMessage> Messages {
+		public ObservableCollection<Message> Messages
+		{
 			get
 			{
 				return _messages;
@@ -136,31 +140,40 @@ namespace VKExport.ViewModels
 
 		public MainViewModel()
 		{
+			UserId = 1;
 			CountMessages = 200;
-			Messages = new ObservableCollection<DialogMessage>();
+			Messages = new ObservableCollection<Message>();
 		}
 
 		private void LoadData()
 		{
-			Status = "Загрузка сообщений...";
-
-			var messages = VkApiHelpers.LoadMessages(Auth.AccessToken, CountMessages, _offset, UserId);
-			var count = 0;
-
-			foreach (var message in messages)
+			try
 			{
-				++count;
-				Messages.Add(message);
+				var totalCount = 0;
+				var messages = Auth.Messages.GetHistory(UserId, false, out totalCount, Offset, CountMessages);
+
+				foreach (var message in messages)
+				{
+					Messages.Add(message);
+				}
+				Offset += messages.Count;
+
+				if (totalCount == 0)
+				{
+					StatusLog("История сообщений с пуста!");
+				}
+				else if (Offset == totalCount)
+				{
+					StatusLog("Загружена вся история сообщений!");
+				}
+				else
+				{
+					StatusLog(string.Format("Загружено {0} из {1} сообщений", messages.Count, totalCount));
+				}
 			}
-
-			if (count == 0)
+			catch (Exception e)
 			{
-				Status = "Загружена вся история сообщений!";
-			}
-			else
-			{
-				Status = "Загрузка завершена!";
-				Offset += count;
+				StatusLog("Ошибка: " + e.Message);
 			}
 		}
 
@@ -170,11 +183,11 @@ namespace VKExport.ViewModels
 
 			if (SaveToFile(json))
 			{
-				Status = "Успешно сохранено!";
+				StatusLog("Успешно сохранено!");
 			}
 			else
 			{
-				Status = "Сохранение отменено!";
+				StatusLog("Сохранение отменено!");
 			}
 		}
 
@@ -198,12 +211,17 @@ namespace VKExport.ViewModels
 			Messages.Clear();
 			Offset = 0;
 
-			Status = "Успешно очищено!";
+			StatusLog("Успешно очищено!");
 		}
 
 		public void OnAuthorized(object sender, VkAuthEventArgs e)
 		{
 			Auth = e.Data;
+		}
+
+		private void StatusLog(string message)
+		{
+			Status = message;
 		}
 	}
 }

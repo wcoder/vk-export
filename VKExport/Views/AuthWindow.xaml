@@ -5,8 +5,13 @@
 		Height="500" Width="500"
 		ResizeMode="NoResize" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen">
 	<Grid>
-		<WebBrowser x:Name="Browser"
-					LoadCompleted="Browser_LoadCompleted"
-					/>
+		<StackPanel Width="200" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<!-- TODO: стили -->
+			<TextBlock Text="Ваш логин (Email или номер телефона):" />
+			<TextBox x:Name="Login" />
+			<TextBlock Text="Ваш пароль:" />
+			<PasswordBox x:Name="Password" />
+			<Button Content="Войти" Click="AuthButton_Click"/>				
+		</StackPanel>		
 	</Grid>
 </Window>
